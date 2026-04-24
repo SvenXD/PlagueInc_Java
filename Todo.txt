@@ -1,0 +1,11 @@
+Priority
+
+Probably fix severity in DNA
+Country awareness and willingness to help
+Cure
+Funds per Country / relative to population alive
+
+
+Mid
+
+Integrate DNA and Biohazard bubbles
