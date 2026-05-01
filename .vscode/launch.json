@@ -3,10 +3,10 @@
     "configurations": [
         {
             "type": "java",
-            "name": "Launch Plague Inc",
+            "name": "Current File",
             "request": "launch",
-            "mainClass": "ui_pkg.MainUI",
-            "vmArgs": "--module-path \"c:/Users/Roman/OneDrive/Desktop/Code/Java/zJavaFX/javafx-sdk-26.0.1/lib\" --add-modules javafx.controls,javafx.fxml"
+            "mainClass": "${file}", // Runs whatever tab is open
+            "vmArgs": "--module-path \"C:/Users/Roman/Documents/Code/Code/Java/zJavaFX/javafx-sdk-26.0.1/lib\" --add-modules javafx.controls,javafx.fxml"
         }
     ]
 }
