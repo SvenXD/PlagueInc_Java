@@ -14,6 +14,7 @@ public class Country {
     private final int population;
     private int healthyPopulation;
     private int deadPopulation;
+
     private double infectedPopulation;
     private int daysPerTravel;
     private String name;
@@ -27,6 +28,8 @@ public class Country {
     private boolean airportsOpen = true;
     private boolean portsOpen = true;
     private boolean bordersOpen = true;
+
+    private boolean alreadyInfexted = false;
 
     public Country(int population, String name, Climate climate, Location location, Wealth wealth, int daysPerTravel, double maxContribution){
         this.name = name;
@@ -48,7 +51,16 @@ public class Country {
         if(infectedPopulation == 0.0){
             infectedPopulation = 1.0;
             healthyPopulation --;
+            alreadyInfexted = true;
         }
+    }
+
+    public boolean checkIfFirstInfection(){
+        if(alreadyInfexted){
+            alreadyInfexted = false;
+            return true;
+        }
+        return false;
     }
 
     /*  

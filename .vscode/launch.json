@@ -6,7 +6,12 @@
             "name": "Current File",
             "request": "launch",
             "mainClass": "${file}", // Runs whatever tab is open
-            "vmArgs": "--module-path \"C:/Users/Roman/Documents/Code/Code/Java/zJavaFX/javafx-sdk-26.0.1/lib\" --add-modules javafx.controls,javafx.fxml"
+            "vmArgs": [
+                "--module-path", "C:/Users/Roman/Documents/Code/Code/Java/zJavaFX/javafx-sdk-26.0.1/lib",
+                "--add-modules", "javafx.controls,javafx.fxml,javafx.media",
+                "--add-exports", "javafx.base/com.sun.javafx=ALL-UNNAMED",
+                "--add-exports", "javafx.graphics/com.sun.glass.utils=ALL-UNNAMED"
+            ]
         }
     ]
 }

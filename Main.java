@@ -13,12 +13,18 @@ import game_pkg.cure_pkg.Cure;
 import game_pkg.virus_pkg.Habilities;
 import game_pkg.virus_pkg.Plague;
 import game_pkg.virus_pkg.PlagueType;
+import javafx.application.Application;
+import ui_pkg.ConceptOfMap;
 
 public class Main {
     static final List<TravelGroup> travelList = new ArrayList<>();
     static int totalInfectedPeople = 1;
 
     public static void main(String[] args) {
+
+        new Thread(() -> Application.launch(ConceptOfMap.class, args)).start();
+        
+        try { Thread.sleep(3000); } catch (InterruptedException e) {}
 
         int baseDelayMs = 290; // 100ms per day = 10 days per second
         int speedMultiplier = 1;
@@ -28,7 +34,7 @@ public class Main {
 
         final List<Country> countries = new ArrayList<>();
 
-        countries.add(new Country(72000000, "France", Climate.ARID, Location.RURAL, Wealth.RICH, 4,2));
+        countries.add(new Country(72000000, "France", Climate.ARID, Location.RURAL, Wealth.POOR, 4,2));
         countries.add(new Country(100000, "UK", Climate.ARID, Location.RURAL, Wealth.RICH, 4,2));
         countries.add(new Country(300000, "Mexico", Climate.ARID, Location.RURAL, Wealth.MIDDLE, 3,1));
         countries.add(new Country(400000, "USA", Climate.ARID, Location.RURAL, Wealth.RICH, 4,3));
@@ -75,17 +81,27 @@ public class Main {
                 m_cure.updateCureProgress();
                 m_cure.resetFunds();
 
+                /*  UI */
+
+                for(Country c : countries){
+                    if(c.checkIfFirstInfection()){
+                            ConceptOfMap.getInstance().showBubbleAt(623.8, 252.8);
+                    }
+                }
+
+
+
                 System.out.println("Day: " + daysPassed);
                 System.out.println("France Infected: " + countries.get(0).getInfectedPopulation());
                 System.out.println("Mexico Infected: " + countries.get(2).getInfectedPopulation());
                 System.out.println("UK Infected: " + countries.get(1).getInfectedPopulation());
                 System.out.println("USA Infected: " + countries.get(3).getInfectedPopulation());
 
-                System.out.println("France infected: " + countries.get(0).getInfectedPopulation());
+                /*System.out.println("France infected: " + countries.get(0).getInfectedPopulation());
                 System.out.println("France dead: " + countries.get(0).getDeadPopulation());
                 System.out.println("France healty " + countries.get(0).getHealthyPopulation());
 
-                System.out.println("DNA Points:  " + m_plague.getDNAPoints());
+                System.out.println("DNA Points:  " + m_plague.getDNAPoints());*/
                 
 
             }
