@@ -17,7 +17,7 @@ public class Plague {
         dnaPoints = 3; 
         this.infection = 1.0;
         this.severity = 0.5;
-        this.lethality = 0.1;
+        this.lethality = 0.0;
         habilities = new ArrayList<>();
     }
 

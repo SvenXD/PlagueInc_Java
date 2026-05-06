@@ -3,6 +3,7 @@ package ui_pkg;
 import java.util.ArrayList;
 import java.util.List;
 
+import game_pkg.Main;
 import game_pkg.country_pkg.Country;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -32,10 +33,17 @@ public class ConceptOfMap extends Application {
     private final DoubleProperty yMousePosition = new SimpleDoubleProperty(0.0);
 
     private Image bioBubble = new Image(getClass().getResourceAsStream("/ui_pkg/Assets/Biohazard_bonus_icon.png"));
-    private ImageView biohazardBubble = new ImageView(bioBubble);
 
-    private Timeline hazardBubbleAppearAnimationation;
-    private Timeline hazardBubblePOPAnimationation;
+    private List<ImageView> activeBubbles = new ArrayList<>();
+    private Pane root;
+
+    AudioClip infect_appear = 
+        new AudioClip(getClass().getResource("/ui_pkg/Assets/AudioClip/infect_appear_sfx.wav").toString());
+    AudioClip infect_pop =
+        new AudioClip(getClass().getResource("/ui_pkg/Assets/AudioClip/infect_pop_sfx.wav").toString());
+
+    private Text totalInfected;    
+    private Text totalADN;    
 
     private static ConceptOfMap instance;
 
@@ -43,41 +51,23 @@ public class ConceptOfMap extends Application {
         return instance;
     }
 
-    AudioClip infect_appear = 
-        new AudioClip(getClass().getResource("/ui_pkg/Assets/AudioClip/infect_appear_sfx.wav").toString());
-    AudioClip infect_pop =
-        new AudioClip(getClass().getResource("/ui_pkg/Assets/AudioClip/infect_pop_sfx.wav").toString());
 
     public ConceptOfMap(){
-        hazardBubbleAppearAnimationation = new Timeline(
-            new KeyFrame(Duration.ZERO, 
-                new KeyValue(biohazardBubble.scaleXProperty(), 0),
-                new KeyValue(biohazardBubble.scaleYProperty(), 0)
-            ),
-            new KeyFrame(Duration.millis(100), 
-                new KeyValue(biohazardBubble.scaleXProperty(), 1.1),
-                new KeyValue(biohazardBubble.scaleYProperty(), 1.1)
-            ),
-            new KeyFrame(Duration.millis(300), 
-                new KeyValue(biohazardBubble.scaleXProperty(), 1.0),
-                new KeyValue(biohazardBubble.scaleYProperty(), 1.0)
-            )
-        );
 
-        hazardBubblePOPAnimationation = new Timeline(
-            new KeyFrame(Duration.ZERO, 
-                new KeyValue(biohazardBubble.scaleXProperty(), 1.0),
-                new KeyValue(biohazardBubble.scaleYProperty(), 1.0)
-            ),
-            new KeyFrame(Duration.millis(100), 
-                new KeyValue(biohazardBubble.scaleXProperty(), 1.1),
-                new KeyValue(biohazardBubble.scaleYProperty(), 1.1)
-            ),
-            new KeyFrame(Duration.millis(200), 
-                new KeyValue(biohazardBubble.scaleXProperty(), 0.0),
-                new KeyValue(biohazardBubble.scaleYProperty(), 0.0)
-            )
-        );
+        infect_appear.setVolume(0.5);
+        infect_pop.setVolume(0.5);
+        totalInfected = new Text("0");
+        totalInfected.setFill(Color.WHITE);
+        totalInfected.setLayoutX(600);
+        totalInfected.setLayoutY(700);
+
+        totalADN = new Text("DNA: 0");
+        totalADN.setFill(Color.WHITE);
+        totalADN.setLayoutX(600);
+        totalADN.setLayoutY(500);
+
+        infect_appear.play();
+        infect_pop.play();
     }
     public static void main(String[] args) {
         launch(args);
@@ -98,10 +88,9 @@ public class ConceptOfMap extends Application {
     }
 
     private Region createContent(){
-        Pane root = new Pane(); 
+        root = new Pane(); 
         
         Node map = createWorldMap();
-        Pane bubbleLayer = generateBioBubble();
         
         Text text = new Text();
         text.textProperty().bind(mousePosition);
@@ -109,25 +98,14 @@ public class ConceptOfMap extends Application {
         text.setLayoutX(50);
         text.setLayoutY(700);
 
-        root.getChildren().addAll(map, bubbleLayer, text);
-
-        biohazardBubble.setOnMousePressed(evt -> {
-            System.out.println("pop");
-            hazardBubblePOPAnimationation.playFromStart();
-            infect_pop.play();
-
-            evt.consume();
-        });
+        root.getChildren().addAll(map, text, totalInfected, totalADN);
 
         root.setOnMousePressed(evt -> {
-
 
             System.out.println(xMousePosition.doubleValue());
             xMousePosition.set(evt.getSceneX());
             yMousePosition.set(evt.getSceneY());
             mousePosition.set("X: " + evt.getSceneX() + " Y: " + evt.getSceneY());
-            hazardBubbleAppearAnimationation.playFromStart();
-            infect_appear.play();
         });
 
         return root;
@@ -146,29 +124,72 @@ public class ConceptOfMap extends Application {
         return imageView;
     }
 
-    private Pane generateBioBubble(){
-
-        biohazardBubble.setFitWidth(70);
-
-        biohazardBubble.setPreserveRatio(true);
-
-        Pane wrapper = new Pane(biohazardBubble);
-        
-        biohazardBubble.layoutXProperty().bind(xMousePosition.subtract(35));
-        biohazardBubble.layoutYProperty().bind(yMousePosition.subtract(70));
-
-        biohazardBubble.setScaleX(0);
-        biohazardBubble.setScaleY(0);
-
-        return wrapper;
-    }
-
     public void showBubbleAt(double x, double y){
         Platform.runLater(() -> {
             infect_appear.play();
-            xMousePosition.set(x);
-            yMousePosition.set(y);
-            hazardBubbleAppearAnimationation.playFromStart();
+
+            ImageView bubble = new ImageView(bioBubble);
+            bubble.setFitWidth(70);
+            bubble.setPreserveRatio(true);
+            bubble.setLayoutX(x - 35);
+            bubble.setLayoutY(y - 70);
+            bubble.setScaleX(0);
+            bubble.setScaleY(0);
+
+        Timeline appear = new Timeline(
+            new KeyFrame(Duration.ZERO, 
+                new KeyValue(bubble.scaleXProperty(), 0),
+                new KeyValue(bubble.scaleYProperty(), 0)
+            ),
+            new KeyFrame(Duration.millis(100), 
+                new KeyValue(bubble.scaleXProperty(), 1.1),
+                new KeyValue(bubble.scaleYProperty(), 1.1)
+            ),
+            new KeyFrame(Duration.millis(300), 
+                new KeyValue(bubble.scaleXProperty(), 1.0),
+                new KeyValue(bubble.scaleYProperty(), 1.0)
+            )
+        );
+
+        Timeline pop = new Timeline(
+            new KeyFrame(Duration.ZERO, 
+                new KeyValue(bubble.scaleXProperty(), 1.0),
+                new KeyValue(bubble.scaleYProperty(), 1.0)
+            ),
+            new KeyFrame(Duration.millis(100), 
+                new KeyValue(bubble.scaleXProperty(), 1.1),
+                new KeyValue(bubble.scaleYProperty(), 1.1)
+            ),
+            new KeyFrame(Duration.millis(200), 
+                new KeyValue(bubble.scaleXProperty(), 0.0),
+                new KeyValue(bubble.scaleYProperty(), 0.0)
+            )
+        );
+
+        bubble.setOnMousePressed(evt -> {
+            infect_pop.play();
+            pop.playFromStart();
+            Main.popBioBubble();
+            evt.consume();
         });
+        
+        pop.setOnFinished(e -> {
+            root.getChildren().remove(bubble);
+            activeBubbles.remove(bubble);
+        });
+        
+        root.getChildren().add(bubble);
+        activeBubbles.add(bubble);
+        appear.playFromStart();
+
+        });
+    }
+
+    public void updateTotalInfected(int infected){
+        this.totalInfected.setText("Total infected: " + infected);
+    }
+
+    public void updateTotalDna(int dna){
+        this.totalADN.setText("DNA: " + dna);
     }
 }

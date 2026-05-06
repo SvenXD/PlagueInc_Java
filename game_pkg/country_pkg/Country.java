@@ -14,9 +14,11 @@ public class Country {
     private final int population;
     private int healthyPopulation;
     private int deadPopulation;
+    private int daysPerTravel;
+
+    private double[] coords;
 
     private double infectedPopulation;
-    private int daysPerTravel;
     private String name;
     private List<Connection> countryConnections = new ArrayList<>();
     private double maxContribution;
@@ -31,9 +33,13 @@ public class Country {
 
     private boolean alreadyInfexted = false;
 
-    public Country(int population, String name, Climate climate, Location location, Wealth wealth, int daysPerTravel, double maxContribution){
+    public Country(int population, String name, Climate climate, Location location, 
+        Wealth wealth, int daysPerTravel, double maxContribution, double[] coords){
+
         this.name = name;
         this.population = population;
+
+        this.coords = coords;
     
         this.climate = climate;
         this.location = location;
@@ -45,6 +51,10 @@ public class Country {
         this.daysPerTravel = daysPerTravel;
 
         this.maxContribution = maxContribution;
+    }
+
+    public double[] getCountryCoords(){
+        return this.coords;
     }
 
     public void infectCountry(){

@@ -1,3 +1,4 @@
+package game_pkg;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -19,6 +20,7 @@ import ui_pkg.ConceptOfMap;
 public class Main {
     static final List<TravelGroup> travelList = new ArrayList<>();
     static int totalInfectedPeople = 1;
+    static Plague m_plague = new Plague(PlagueType.VIRUS);
 
     public static void main(String[] args) {
 
@@ -34,10 +36,10 @@ public class Main {
 
         final List<Country> countries = new ArrayList<>();
 
-        countries.add(new Country(72000000, "France", Climate.ARID, Location.RURAL, Wealth.POOR, 4,2));
-        countries.add(new Country(100000, "UK", Climate.ARID, Location.RURAL, Wealth.RICH, 4,2));
-        countries.add(new Country(300000, "Mexico", Climate.ARID, Location.RURAL, Wealth.MIDDLE, 3,1));
-        countries.add(new Country(400000, "USA", Climate.ARID, Location.RURAL, Wealth.RICH, 4,3));
+        countries.add(new Country(72000000, "France", Climate.ARID, Location.RURAL, Wealth.POOR, 4,2, new double[] {652.0, 287.2}));
+        countries.add(new Country(100000, "UK", Climate.ARID, Location.RURAL, Wealth.RICH, 4,2 , new double[] {623.8, 252.8}));
+        countries.add(new Country(300000, "Mexico", Climate.ARID, Location.RURAL, Wealth.MIDDLE, 3,1, new double[] {272.0, 340.}));
+        countries.add(new Country(400000, "USA", Climate.ARID, Location.RURAL, Wealth.RICH, 4,3, new double[] {244.0, 279.2}));
 
         countries.get(0).addConnection(countries.get(1), ConnectionType.AIR, 2);
         countries.get(1).addConnection(countries.get(2), ConnectionType.AIR, 4);
@@ -46,7 +48,6 @@ public class Main {
         countries.get(0).infectCountry();
 
 
-        Plague m_plague = new Plague(PlagueType.VIRUS);
         m_plague.addHability(Habilities.DRUG_RES_II);
 
         int deltaInfections = 0;
@@ -85,11 +86,11 @@ public class Main {
 
                 for(Country c : countries){
                     if(c.checkIfFirstInfection()){
-                            ConceptOfMap.getInstance().showBubbleAt(623.8, 252.8);
+                            ConceptOfMap.getInstance().showBubbleAt(c.getCountryCoords()[0], c.getCountryCoords()[1]);
                     }
                 }
 
-
+                ConceptOfMap.getInstance().updateTotalDna(m_plague.getDNAPoints());
 
                 System.out.println("Day: " + daysPassed);
                 System.out.println("France Infected: " + countries.get(0).getInfectedPopulation());
@@ -133,6 +134,10 @@ public class Main {
             country.recalculateInfected(plague);
             totalInfectedPeople += country.getInfectedPopulation();
         }
+
+        ConceptOfMap.getInstance().updateTotalInfected(totalInfectedPeople);
+
+
         return totalInfectedPeople - deltaInfections;
     }
 
@@ -162,7 +167,7 @@ public class Main {
 
             if (currentDay >= group.getArrivalDay()) {
                 if(group.getDestination().getInfectedPopulation() == 0.0){
-                    plague.popBioHazardBubble();
+                    //plague.popBioHazardBubble();
                 }
                 group.getDestination().infectCountry();
                 //System.out.println(">>> VIRUS LANDED in " + group.getDestination().getCountryName() + "!");
@@ -199,5 +204,9 @@ public class Main {
         for(Country c: list){
             c.recalculateDeadCount(plague);
         }
+    }
+
+    public static void popBioBubble(){
+        m_plague.popBioHazardBubble();
     }
 }
