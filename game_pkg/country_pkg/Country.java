@@ -81,7 +81,7 @@ public class Country {
         if(infectedPopulation > population){
             return;
         }
-        double growthBonus = 0.07;
+        double growthBonus = 0.03;
 
         if(this.climate == Climate.COLD || this.climate == Climate.HOT){
             growthBonus *= 0.8;

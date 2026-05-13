@@ -4,11 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import game_pkg.virus_pkg.Enums.Habilities;
+import game_pkg.virus_pkg.Enums.Symptoms;
+
 public class Plague {
     
     private PlagueType plagueType;
-    private double infection, severity, lethality;
+    private double infection, severity, lethality, cureBonus;
     private List<Habilities> habilities;
+    private List<Symptoms> symptoms;
 
     private double dnaPoints;
 
@@ -18,7 +22,20 @@ public class Plague {
         this.infection = 1.0;
         this.severity = 0.5;
         this.lethality = 0.0;
+        this.cureBonus = 0.0;
         habilities = new ArrayList<>();
+        symptoms = new ArrayList<>();
+
+    }
+
+    public void evolveSymptom(Symptoms s){
+        symptoms.add(s);
+
+        this.infection += s.infectivityBonus;
+        this.severity += s.severityBonus;
+        this.lethality += s.lethalityBonus;
+
+        this.addToDNA(-s.dnaCost);
     }
 
     public void addHability(Habilities habilities){

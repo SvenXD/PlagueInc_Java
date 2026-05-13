@@ -11,9 +11,9 @@ import game_pkg.country_pkg.Enums.ConnectionType;
 import game_pkg.country_pkg.Enums.Location;
 import game_pkg.country_pkg.Enums.Wealth;
 import game_pkg.cure_pkg.Cure;
-import game_pkg.virus_pkg.Habilities;
 import game_pkg.virus_pkg.Plague;
 import game_pkg.virus_pkg.PlagueType;
+import game_pkg.virus_pkg.Enums.Habilities;
 import javafx.application.Application;
 import ui_pkg.ConceptOfMap;
 
